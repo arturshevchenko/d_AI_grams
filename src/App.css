@@ -1,38 +1,276 @@
-.App {
-  text-align: center;
+.loader {
+    border: 8px solid #f3f3f3; /* Light gray */
+    border-top: 8px solid #007acc; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto; /* Center the loader */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Global Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+    color: #333;
+}
+
+/* Container for the entire app */
+.app-container {
+    max-width: 90%;
+    margin: 40px auto;
+    padding: 40px;
+    background: #ffffff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Title styles */
+.title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    color: #007acc;
+}
+
+/* Container for text areas and button */
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Styles for textareas */
+.input-area {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e1e5eb;
+    border-radius: 5px;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.input-area:focus {
+    border-color: #007acc;
+    outline: none;
+}
+
+/* Button styles */
+.generate-button {
+    align-self: center;
+    padding: 10px 25px;
+    font-size: 1.2rem;
+    background-color: #007acc;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.generate-button:hover {
+    background-color: #005fa3;
+}
+
+/* Diagram container styling */
+.diagram-container {
+    margin-top: 30px;
+    padding: 20px;
+    border: 2px dashed #007acc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Copy container styling */
+.copy-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.instruction-text {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0;
+}
+
+.copy-text {
+    font-family: monospace;
+    font-size: 0.9rem;
+    background-color: #f3f3f3;
+    padding: 8px;
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+.copy-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: #007acc;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+}
+
+.copy-button:hover {
+    background-color: #005fa3;
+}
+
+.collapsible-container {
+    margin-top: 20px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+.collapsible-content {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-family: monospace;
+    white-space: pre-wrap; /* Preserve formatting for Mermaid.js code */
+    overflow-x: auto; /* Allow horizontal scrolling for long lines */
+}
+
+.diagram-container {
+    margin-top: 20px;
+}
+
+
+.edit-container {
+    margin-bottom: 20px;
+    width: 100%;
   }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  
+  .edit-textarea {
+    width: 100%;
+    min-height: 300px;
+    font-family: monospace;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .edit-button, .apply-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
   }
-}
+  
+  .edit-button:hover, .apply-button:hover {
+    background-color: #45a049;
+  }
+  
+  .apply-button {
+    background-color: #2196F3;
+  }
+  
+  .apply-button:hover {
+    background-color: #0b7dda;
+  }
+  
+  .toggle-button {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .toggle-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .collapsible-content {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  /* Add these styles to your App.css */
+
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: fadeInOut 3s ease;
+    max-width: 300px;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+  }
+  
+  /* Optional: Add this style to make the copy button show visual feedback */
+  .copy-button {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .copy-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-100%);
+    transition: transform 0.2s ease;
+  }
+  
+  .copy-button:active::after {
+    transform: translateY(0);
+  }
