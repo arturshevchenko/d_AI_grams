@@ -91,11 +91,16 @@ body {
 
 /* Copy container styling */
 .copy-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-top: 5px;
-    margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.copy-container .button-group {
+  display: flex;
+  gap: 10px;
 }
 
 .instruction-text {
@@ -113,20 +118,22 @@ body {
     word-break: break-all;
 }
 
-.copy-button {
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    background-color: #007acc;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    align-self: flex-start;
+.copy-button,
+.paste-button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  background-color: #007acc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-start;
 }
 
-.copy-button:hover {
-    background-color: #005fa3;
+.copy-button:hover,
+.paste-button:hover {
+  background-color: #005fa3;
 }
 
 .collapsible-container {
@@ -274,3 +281,68 @@ body {
   .copy-button:active::after {
     transform: translateY(0);
   }
+
+/* Add styles for buttons */
+.show-raw-button,
+.edit-button,
+.download-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.show-raw-button:hover,
+.edit-button:hover,
+.download-button:hover {
+  background-color: #0056b3;
+}
+
+.apply-button,
+.close-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.apply-button:hover,
+.close-button:hover {
+  background-color: #1e7e34;
+}
+
+.diagram-textarea {
+  width: 100%;
+  height: 150px;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: vertical;
+}
+
+/* Update Paste button styles to match Copy button */
+.paste-button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  background-color: #007acc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-start;
+}
+
+.paste-button:hover {
+  background-color: #005fa3;
+}

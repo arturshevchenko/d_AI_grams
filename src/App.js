@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import "./App.css";
 import SYSTEM_FIRST_PROMPT from "./prompts/systemFirstPrompt";
-import SYSTEM_THIRD_PROMPT from "./prompts/systemThirdPrompt";
+import SYSTEM_THIRD_PROMPT from "./prompts/systemSecondPrompt";
 
 // Initialize Mermaid (disable auto-render on page load)
 mermaid.initialize({ startOnLoad: false });
@@ -13,9 +13,11 @@ function App() {
   const [readmeFile, setReadmeFile] = useState("");
   const [diagramDefinition, setDiagramDefinition] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isEditingDiagram, setIsEditingDiagram] = useState(false);
+  const [isEditingDiagram] = useState(false);
   const [editedDiagramText, setEditedDiagramText] = useState("");
   const [copyFeedback, setCopyFeedback] = useState({ show: false, text: "" });
+  const [isTextAreaVisible, setIsTextAreaVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const diagramRef = useRef(null);
 
   const fileTreeCommand = `find . -type f \
@@ -67,6 +69,22 @@ function App() {
           setCopyFeedback({ show: false, text: "" });
         }, 3000);
       });
+  };
+
+  const pasteFromClipboard = async (setFunction) => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setFunction(text);
+    } catch (err) {
+      console.error("Failed to paste: ", err);
+      setCopyFeedback({ 
+        show: true, 
+        text: "Failed to paste from clipboard" 
+      });
+      setTimeout(() => {
+        setCopyFeedback({ show: false, text: "" });
+      }, 3000);
+    }
   };
 
   // Helper function to call OpenAI API
@@ -145,18 +163,17 @@ function App() {
     }
   };
 
-  // Function to redraw the diagram with edited text
-  const redrawDiagram = () => {
-    setDiagramDefinition(editedDiagramText);
+  const toggleTextArea = (editing = false) => {
+    setIsTextAreaVisible(true);
+    setIsEditing(editing);
   };
 
-  // Function to toggle edit mode
-  const toggleEditMode = () => {
-    if (isEditingDiagram) {
-      // If we're exiting edit mode, update the diagram with edited text
-      redrawDiagram();
+  const applyChanges = () => {
+    if (isEditing) {
+      setDiagramDefinition(editedDiagramText);
     }
-    setIsEditingDiagram(!isEditingDiagram);
+    setIsTextAreaVisible(false);
+    setIsEditing(false);
   };
 
   useEffect(() => {
@@ -168,82 +185,60 @@ function App() {
       const diagramContainer = document.createElement("div");
       diagramContainer.className = "diagram-container";
 
-      // Create the edit container
-      const editContainer = document.createElement("div");
-      editContainer.className = "edit-container";
+      // Create the Show RAW Text button
+      const showRawButton = document.createElement("button");
+      showRawButton.textContent = "Show Diagram as RAW Text";
+      showRawButton.className = "show-raw-button";
+      showRawButton.onclick = () => toggleTextArea(false);
 
-      // Create a button to toggle edit mode
+      // Create the Edit Diagram button
       const editButton = document.createElement("button");
-      editButton.textContent = isEditingDiagram ? "Apply Changes" : "Edit Diagram";
+      editButton.textContent = "Edit Diagram";
       editButton.className = "edit-button";
-      editButton.onclick = toggleEditMode;
+      editButton.onclick = () => toggleTextArea(true);
 
-      // Create the edit area or view area based on edit mode
-      if (isEditingDiagram) {
-        const editTextArea = document.createElement("textarea");
-        editTextArea.className = "edit-textarea";
-        editTextArea.value = editedDiagramText;
-        editTextArea.addEventListener("input", (e) => {
-          setEditedDiagramText(e.target.value);
-        });
-        
-        // Create additional button for applying changes without exiting edit mode
-        const applyButton = document.createElement("button");
-        applyButton.textContent = "Apply Without Exiting";
-        applyButton.className = "apply-button";
-        applyButton.onclick = redrawDiagram;
-        
-        editContainer.appendChild(editTextArea);
-        editContainer.appendChild(document.createElement("br"));
-        editContainer.appendChild(editButton);
-        editContainer.appendChild(applyButton);
-      } else {
-        // Create a collapsible container for the raw text view
-        const collapsibleContainer = document.createElement("div");
-        collapsibleContainer.className = "collapsible-container";
+      // Create the Download SVG button
+      const downloadButton = document.createElement("button");
+      downloadButton.textContent = "Download SVG";
+      downloadButton.className = "download-button";
+      downloadButton.onclick = () => {
+        const svgElement = diagramRef.current.querySelector("svg");
+        if (svgElement) {
+          const serializer = new XMLSerializer();
+          const svgString = serializer.serializeToString(svgElement);
+          const blob = new Blob([svgString], { type: "image/svg+xml" });
+          const url = URL.createObjectURL(blob);
 
-        // Create a button to toggle the collapsible content
-        const toggleButton = document.createElement("button");
-        toggleButton.textContent = "Show/Hide Raw Text";
-        toggleButton.className = "toggle-button";
-        toggleButton.onclick = () => {
-          const content = collapsibleContainer.querySelector(".collapsible-content");
-          if (content.style.display === "none" || !content.style.display) {
-            content.style.display = "block";
-          } else {
-            content.style.display = "none";
-          }
-        };
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "diagram.svg";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        } else {
+          console.error("No SVG element found to download.");
+        }
+      };
 
-        // Create the collapsible content for the raw text
-        const collapsibleContent = document.createElement("div");
-        collapsibleContent.className = "collapsible-content";
-        collapsibleContent.style.display = "none"; // Initially hidden
-        collapsibleContent.textContent = diagramDefinition;
-
-        // Append the button and content to the collapsible container
-        collapsibleContainer.appendChild(toggleButton);
-        collapsibleContainer.appendChild(collapsibleContent);
-        collapsibleContainer.appendChild(editButton);
-
-        editContainer.appendChild(collapsibleContainer);
-      }
+      // Append the buttons to the diagram container
+      diagramContainer.appendChild(showRawButton);
+      diagramContainer.appendChild(editButton);
+      diagramContainer.appendChild(downloadButton);
 
       // Create the Mermaid diagram container
       const mermaidDiagram = document.createElement("div");
       mermaidDiagram.className = "mermaid";
       mermaidDiagram.innerHTML = diagramDefinition;
 
-      // Append the edit container to diagramRef
-      diagramRef.current.appendChild(editContainer);
-      
-      if (!isEditingDiagram) {
-        // Only append and render diagram if not in edit mode
-        diagramContainer.appendChild(mermaidDiagram);
-        diagramRef.current.appendChild(diagramContainer);
-        // Render the Mermaid diagram
-        mermaid.run();
-      }
+      // Append the Mermaid diagram to the container
+      diagramContainer.appendChild(mermaidDiagram);
+
+      // Append the diagram container to the diagramRef
+      diagramRef.current.appendChild(diagramContainer);
+
+      // Render the Mermaid diagram
+      mermaid.run();
     }
   }, [diagramDefinition, isEditingDiagram, editedDiagramText]);
 
@@ -264,12 +259,20 @@ function App() {
             Paste this command in terminal to get file tree:
           </p>
           <p className="copy-text">{fileTreeCommand}</p>
-          <button
-            onClick={() => copyToClipboard(fileTreeCommand, "File tree command")}
-            className="copy-button"
-          >
-            Copy
-          </button>
+          <div className="button-group">
+            <button
+              onClick={() => copyToClipboard(fileTreeCommand, "File tree command")}
+              className="copy-button"
+            >
+              Copy
+            </button>
+            <button
+              onClick={() => pasteFromClipboard(setTreeStructure)}
+              className="paste-button"
+            >
+              Paste
+            </button>
+          </div>
         </div>
         <textarea
           placeholder="Enter tree structure here..."
@@ -288,12 +291,20 @@ function App() {
             Paste this command in terminal to get imports:
           </p>
           <p className="copy-text">{importsCommand}</p>
-          <button
-            onClick={() => copyToClipboard(importsCommand, "Imports command")}
-            className="copy-button"
-          >
-            Copy
-          </button>
+          <div className="button-group">
+            <button
+              onClick={() => copyToClipboard(importsCommand, "Imports command")}
+              className="copy-button"
+            >
+              Copy
+            </button>
+            <button
+              onClick={() => pasteFromClipboard(setImportsStructure)}
+              className="paste-button"
+            >
+              Paste
+            </button>
+          </div>
         </div>
         <textarea
           placeholder="Enter imports here..."
@@ -310,6 +321,26 @@ function App() {
         </button>
       </div>
       {isLoading && <div className="loader"></div>}
+      {isTextAreaVisible && (
+        <div className="textarea-container">
+          <textarea
+            value={editedDiagramText}
+            onChange={(e) => setEditedDiagramText(e.target.value)}
+            readOnly={!isEditing}
+            className="diagram-textarea"
+          />
+          {isEditing && (
+            <button onClick={applyChanges} className="apply-button">
+              Apply Changes
+            </button>
+          )}
+          {!isEditing && (
+            <button onClick={() => setIsTextAreaVisible(false)} className="close-button">
+              Close
+            </button>
+          )}
+        </div>
+      )}
       <div ref={diagramRef} className="diagram-container" />
     </div>
   );
