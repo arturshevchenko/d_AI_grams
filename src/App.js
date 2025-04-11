@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import "./App.css";
 import SYSTEM_FIRST_PROMPT from "./prompts/systemFirstPrompt";
-import SYSTEM_THIRD_PROMPT from "./prompts/systemSecondPrompt";
+import SYSTEM_SECOND_PROMPT from "./prompts/systemSecondPrompt";
+import SYSTEM_THIRD_PROMPT from "./prompts/systemThirdPrompt";
 
 // Initialize Mermaid (disable auto-render on page load)
 mermaid.initialize({ startOnLoad: false });
@@ -11,14 +12,25 @@ function App() {
   const [treeStructure, setTreeStructure] = useState("");
   const [importsStructure, setImportsStructure] = useState("");
   const [readmeFile, setReadmeFile] = useState("");
-  const [diagramDefinition, setDiagramDefinition] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isEditingDiagram] = useState(false);
-  const [editedDiagramText, setEditedDiagramText] = useState("");
   const [copyFeedback, setCopyFeedback] = useState({ show: false, text: "" });
-  const [isTextAreaVisible, setIsTextAreaVisible] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const diagramRef = useRef(null);
+  const [diagramsGenerated, setDiagramsGenerated] = useState(false);
+
+  // First diagram states
+  const [firstDiagramDefinition, setFirstDiagramDefinition] = useState("");
+  const [isEditingFirstDiagram, setIsEditingFirstDiagram] = useState(false);
+  const [editedFirstDiagramText, setEditedFirstDiagramText] = useState("");
+  const [isFirstTextAreaVisible, setIsFirstTextAreaVisible] = useState(false);
+
+  // Second diagram states
+  const [secondDiagramDefinition, setSecondDiagramDefinition] = useState("");
+  const [isEditingSecondDiagram, setIsEditingSecondDiagram] = useState(false);
+  const [editedSecondDiagramText, setEditedSecondDiagramText] = useState("");
+  const [isSecondTextAreaVisible, setIsSecondTextAreaVisible] = useState(false);
+
+  // Separate refs for each diagram
+  const firstDiagramRef = useRef(null);
+  const secondDiagramRef = useRef(null);
 
   const fileTreeCommand = `find . -type f \
         -not -path "*/node_modules/*" \
@@ -48,11 +60,11 @@ function App() {
       .writeText(command)
       .then(() => {
         // Show toast notification
-        setCopyFeedback({ 
-          show: true, 
-          text: `${buttonName} copied to clipboard!` 
+        setCopyFeedback({
+          show: true,
+          text: `${buttonName} copied to clipboard!`,
         });
-        
+
         // Hide notification after 3 seconds
         setTimeout(() => {
           setCopyFeedback({ show: false, text: "" });
@@ -60,11 +72,11 @@ function App() {
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
-        setCopyFeedback({ 
-          show: true, 
-          text: "Failed to copy to clipboard" 
+        setCopyFeedback({
+          show: true,
+          text: "Failed to copy to clipboard",
         });
-        
+
         setTimeout(() => {
           setCopyFeedback({ show: false, text: "" });
         }, 3000);
@@ -77,9 +89,9 @@ function App() {
       setFunction(text);
     } catch (err) {
       console.error("Failed to paste: ", err);
-      setCopyFeedback({ 
-        show: true, 
-        text: "Failed to paste from clipboard" 
+      setCopyFeedback({
+        show: true,
+        text: "Failed to paste from clipboard",
       });
       setTimeout(() => {
         setCopyFeedback({ show: false, text: "" });
@@ -97,14 +109,14 @@ function App() {
       },
       body: JSON.stringify(payload),
     });
-    
+
     if (!response.ok) {
       throw new Error(`API call failed with status: ${response.status}`);
     }
-    
+
     return await response.json();
   };
-  
+
   // Helper function to clean and format diagram definition
   const cleanDiagramDefinition = (rawDefinition) => {
     return rawDefinition
@@ -112,13 +124,17 @@ function App() {
       .replace(/\\"/g, '"')
       .replace('""', '"uses"')
       .replace(/\|\s+"/g, '|"')
-      .replace(/"\s+\|/g, '"|');
+      .replace(/\bstyle\b/g, "style1")
+      .replace(/\|""\|/g, '|"uses"|')
+      .replace(/"\s+\|/g, '"|')
+      .replace(/```/g, '')
+      .replace(/mermaid/g, '');
   };
 
   const generateDiagram = async () => {
     try {
       setIsLoading(true);
-      
+
       // First API call - analyze code structure
       const firstCallResponse = await callOpenAI({
         model: "gpt-4o-mini",
@@ -133,14 +149,14 @@ function App() {
         ],
         temperature: 0.7,
       });
-      
+
       const firstReply = firstCallResponse.choices[0].message.content;
-      
-      // Second API call - generate diagram from explanation
+
+      // Second API call - generate first diagram from explanation
       const secondCallResponse = await callOpenAI({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: SYSTEM_THIRD_PROMPT },
+          { role: "system", content: SYSTEM_SECOND_PROMPT },
           {
             role: "user",
             content: `<explanation> ${firstReply} </explanation>`,
@@ -148,14 +164,39 @@ function App() {
         ],
         temperature: 0.7,
       });
-      
+
       const secondReply = secondCallResponse.choices[0].message.content;
-      
-      // Process the diagram definition
-      const cleanedDiagram = cleanDiagramDefinition(secondReply);
-      
-      setDiagramDefinition(cleanedDiagram);
-      setEditedDiagramText(cleanedDiagram);
+
+      // Third API call - generate second diagram from explanation
+      const thirdCallResponse = await callOpenAI({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: SYSTEM_THIRD_PROMPT },
+          {
+            role: "user",
+            content: `<file_tree> ${treeStructure} </file_tree> 
+            <readme> ${readmeFile} </readme> 
+            <imports> ${importsStructure} </imports>
+            <explanation> ${firstReply} </explanation>`,
+          },
+        ],
+        temperature: 0.7,
+      });
+
+      const thirdReply = thirdCallResponse.choices[0].message.content;
+
+      // Process the first diagram definition
+      const cleanedFirstDiagram = cleanDiagramDefinition(secondReply);
+      setFirstDiagramDefinition(cleanedFirstDiagram);
+      setEditedFirstDiagramText(cleanedFirstDiagram);
+
+      // Process the second diagram definition
+      const cleanedSecondDiagram = cleanDiagramDefinition(thirdReply);
+      setSecondDiagramDefinition(cleanedSecondDiagram);
+      setEditedSecondDiagramText(cleanedSecondDiagram);
+
+      // Set diagrams as generated
+      setDiagramsGenerated(true);
     } catch (error) {
       console.error("Error generating diagram:", error);
     } finally {
@@ -163,84 +204,69 @@ function App() {
     }
   };
 
-  const toggleTextArea = (editing = false) => {
-    setIsTextAreaVisible(true);
-    setIsEditing(editing);
+  // First diagram functions
+  const toggleFirstTextArea = (editing = false) => {
+    setIsFirstTextAreaVisible(true);
+    setIsEditingFirstDiagram(editing);
   };
 
-  const applyChanges = () => {
-    if (isEditing) {
-      setDiagramDefinition(editedDiagramText);
+  const applyFirstChanges = () => {
+    if (isEditingFirstDiagram) {
+      setFirstDiagramDefinition(editedFirstDiagramText);
     }
-    setIsTextAreaVisible(false);
-    setIsEditing(false);
+    setIsFirstTextAreaVisible(false);
+    setIsEditingFirstDiagram(false);
   };
 
+  // Second diagram functions
+  const toggleSecondTextArea = (editing = false) => {
+    setIsSecondTextAreaVisible(true);
+    setIsEditingSecondDiagram(editing);
+  };
+
+  const applySecondChanges = () => {
+    if (isEditingSecondDiagram) {
+      setSecondDiagramDefinition(editedSecondDiagramText);
+    }
+    setIsSecondTextAreaVisible(false);
+    setIsEditingSecondDiagram(false);
+  };
+
+  // Render first diagram when its state changes
   useEffect(() => {
-    if (diagramDefinition && diagramRef.current) {
-      // Clear the previous content
-      diagramRef.current.innerHTML = "";
-
-      // Create a container for the Mermaid diagram
-      const diagramContainer = document.createElement("div");
-      diagramContainer.className = "diagram-container";
-
-      // Create the Show RAW Text button
-      const showRawButton = document.createElement("button");
-      showRawButton.textContent = "Show Diagram as RAW Text";
-      showRawButton.className = "show-raw-button";
-      showRawButton.onclick = () => toggleTextArea(false);
-
-      // Create the Edit Diagram button
-      const editButton = document.createElement("button");
-      editButton.textContent = "Edit Diagram";
-      editButton.className = "edit-button";
-      editButton.onclick = () => toggleTextArea(true);
-
-      // Create the Download SVG button
-      const downloadButton = document.createElement("button");
-      downloadButton.textContent = "Download SVG";
-      downloadButton.className = "download-button";
-      downloadButton.onclick = () => {
-        const svgElement = diagramRef.current.querySelector("svg");
-        if (svgElement) {
-          const serializer = new XMLSerializer();
-          const svgString = serializer.serializeToString(svgElement);
-          const blob = new Blob([svgString], { type: "image/svg+xml" });
-          const url = URL.createObjectURL(blob);
-
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "diagram.svg";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        } else {
-          console.error("No SVG element found to download.");
-        }
-      };
-
-      // Append the buttons to the diagram container
-      diagramContainer.appendChild(showRawButton);
-      diagramContainer.appendChild(editButton);
-      diagramContainer.appendChild(downloadButton);
+    if (firstDiagramDefinition && firstDiagramRef.current) {
+      firstDiagramRef.current.innerHTML = "";
 
       // Create the Mermaid diagram container
-      const mermaidDiagram = document.createElement("div");
-      mermaidDiagram.className = "mermaid";
-      mermaidDiagram.innerHTML = diagramDefinition;
+      const mermaidDiv = document.createElement("div");
+      mermaidDiv.className = "mermaid";
+      mermaidDiv.innerHTML = firstDiagramDefinition;
 
       // Append the Mermaid diagram to the container
-      diagramContainer.appendChild(mermaidDiagram);
-
-      // Append the diagram container to the diagramRef
-      diagramRef.current.appendChild(diagramContainer);
+      firstDiagramRef.current.appendChild(mermaidDiv);
 
       // Render the Mermaid diagram
       mermaid.run();
     }
-  }, [diagramDefinition, isEditingDiagram, editedDiagramText]);
+  }, [firstDiagramDefinition]);
+
+  // Render second diagram when its state changes
+  useEffect(() => {
+    if (secondDiagramDefinition && secondDiagramRef.current) {
+      secondDiagramRef.current.innerHTML = "";
+
+      // Create the Mermaid diagram container
+      const mermaidDiv = document.createElement("div");
+      mermaidDiv.className = "mermaid";
+      mermaidDiv.innerHTML = secondDiagramDefinition;
+
+      // Append the Mermaid diagram to the container
+      secondDiagramRef.current.appendChild(mermaidDiv);
+
+      // Render the Mermaid diagram
+      mermaid.run();
+    }
+  }, [secondDiagramDefinition]);
 
   return (
     <div className="app-container">
@@ -248,9 +274,7 @@ function App() {
 
       {/* Toast notification */}
       {copyFeedback.show && (
-        <div className="toast-notification">
-          {copyFeedback.text}
-        </div>
+        <div className="toast-notification">{copyFeedback.text}</div>
       )}
 
       <div className="input-container">
@@ -261,7 +285,9 @@ function App() {
           <p className="copy-text">{fileTreeCommand}</p>
           <div className="button-group">
             <button
-              onClick={() => copyToClipboard(fileTreeCommand, "File tree command")}
+              onClick={() =>
+                copyToClipboard(fileTreeCommand, "File tree command")
+              }
               className="copy-button"
             >
               Copy
@@ -274,18 +300,21 @@ function App() {
             </button>
           </div>
         </div>
+
         <textarea
           placeholder="Enter tree structure here..."
           value={treeStructure}
           onChange={(e) => setTreeStructure(e.target.value)}
           className="input-area"
         />
+
         <textarea
           placeholder="Enter readme content here..."
           value={readmeFile}
           onChange={(e) => setReadmeFile(e.target.value)}
           className="input-area"
         />
+
         <div className="copy-container">
           <p className="instruction-text">
             Paste this command in terminal to get imports:
@@ -306,42 +335,171 @@ function App() {
             </button>
           </div>
         </div>
+
         <textarea
           placeholder="Enter imports here..."
           value={importsStructure}
           onChange={(e) => setImportsStructure(e.target.value)}
           className="input-area"
         />
+
         <button
           onClick={generateDiagram}
           className="generate-button"
           disabled={isLoading}
         >
-          {isLoading ? "Generating..." : "Generate Diagram"}
+          {isLoading ? "Generating..." : "Generate Diagrams"}
         </button>
       </div>
+
       {isLoading && <div className="loader"></div>}
-      {isTextAreaVisible && (
-        <div className="textarea-container">
-          <textarea
-            value={editedDiagramText}
-            onChange={(e) => setEditedDiagramText(e.target.value)}
-            readOnly={!isEditing}
-            className="diagram-textarea"
-          />
-          {isEditing && (
-            <button onClick={applyChanges} className="apply-button">
-              Apply Changes
-            </button>
-          )}
-          {!isEditing && (
-            <button onClick={() => setIsTextAreaVisible(false)} className="close-button">
-              Close
-            </button>
-          )}
+
+      {/* Diagram container sections - only shown after generation */}
+      {diagramsGenerated && (
+        <div className="diagrams-section">
+          <div className="diagram-wrapper">
+            <h2>First Diagram</h2>
+            <div className="button-group">
+              <button
+                onClick={() => toggleFirstTextArea(false)}
+                className="show-raw-button"
+              >
+                Show Diagram as RAW Text
+              </button>
+              <button
+                onClick={() => toggleFirstTextArea(true)}
+                className="edit-button"
+              >
+                Edit Diagram
+              </button>
+              <button
+                onClick={() => {
+                  const svgElement =
+                    firstDiagramRef.current.querySelector("svg");
+                  if (svgElement) {
+                    const serializer = new XMLSerializer();
+                    const svgString = serializer.serializeToString(svgElement);
+                    const blob = new Blob([svgString], {
+                      type: "image/svg+xml",
+                    });
+                    const url = URL.createObjectURL(blob);
+
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `diagram-first.svg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                  } else {
+                    console.error("No SVG element found to download.");
+                  }
+                }}
+                className="download-button"
+              >
+                Download SVG
+              </button>
+            </div>
+
+            {/* First diagram text area directly under buttons */}
+            {isFirstTextAreaVisible && (
+              <div className="textarea-container">
+                <textarea
+                  value={editedFirstDiagramText}
+                  onChange={(e) => setEditedFirstDiagramText(e.target.value)}
+                  readOnly={!isEditingFirstDiagram}
+                  className="diagram-textarea"
+                />
+                {isEditingFirstDiagram ? (
+                  <button onClick={applyFirstChanges} className="apply-button">
+                    Apply Changes
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsFirstTextAreaVisible(false)}
+                    className="close-button"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div ref={firstDiagramRef} className="diagram-display" />
+          </div>
+
+          <div className="diagram-wrapper">
+            <h2>Second Diagram</h2>
+            <div className="button-group">
+              <button
+                onClick={() => toggleSecondTextArea(false)}
+                className="show-raw-button"
+              >
+                Show Diagram as RAW Text
+              </button>
+              <button
+                onClick={() => toggleSecondTextArea(true)}
+                className="edit-button"
+              >
+                Edit Diagram
+              </button>
+              <button
+                onClick={() => {
+                  const svgElement =
+                    secondDiagramRef.current.querySelector("svg");
+                  if (svgElement) {
+                    const serializer = new XMLSerializer();
+                    const svgString = serializer.serializeToString(svgElement);
+                    const blob = new Blob([svgString], {
+                      type: "image/svg+xml",
+                    });
+                    const url = URL.createObjectURL(blob);
+
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `diagram-second.svg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                  } else {
+                    console.error("No SVG element found to download.");
+                  }
+                }}
+                className="download-button"
+              >
+                Download SVG
+              </button>
+            </div>
+
+            {/* Second diagram text area directly under buttons */}
+            {isSecondTextAreaVisible && (
+              <div className="textarea-container">
+                <textarea
+                  value={editedSecondDiagramText}
+                  onChange={(e) => setEditedSecondDiagramText(e.target.value)}
+                  readOnly={!isEditingSecondDiagram}
+                  className="diagram-textarea"
+                />
+                {isEditingSecondDiagram ? (
+                  <button onClick={applySecondChanges} className="apply-button">
+                    Apply Changes
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsSecondTextAreaVisible(false)}
+                    className="close-button"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div ref={secondDiagramRef} className="diagram-display" />
+          </div>
         </div>
       )}
-      <div ref={diagramRef} className="diagram-container" />
     </div>
   );
 }

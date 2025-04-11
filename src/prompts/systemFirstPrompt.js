@@ -15,7 +15,7 @@ const SYSTEM_FIRST_PROMPT = `
                 - Identify patterns in the directory structure that might indicate architectural choices (e.g., MVC pattern, microservices, SOA, DDD, SAGA, CQRS, EDA, monolith).
                 - Note any configuration files, build scripts, or deployment-related files.
                 - Include all models that described tables, all services, all repositories and all controllers(views) based on <file_tree>
-                - Include all modules that described in <imports> and exclude all external depencencies and imports.
+                - Include all modules that described in <imports> and exclude all external dependencies and imports.
                 - Do not include modules for migrations
             3. Examine the README for additional insights:
                 - Look for sections describing the architecture, dependencies, or technical stack.
