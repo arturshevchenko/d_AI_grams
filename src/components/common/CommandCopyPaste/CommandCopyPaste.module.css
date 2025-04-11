@@ -1,0 +1,32 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .instruction {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    margin: 0;
+  }
+  
+  .command {
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    background-color: var(--color-gray-100);
+    padding: var(--spacing-2);
+    border-radius: var(--border-radius);
+    word-break: break-all;
+    margin: 0;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    gap: var(--spacing-2);
+  }
+  
+  .button {
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }

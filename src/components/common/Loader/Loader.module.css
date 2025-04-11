@@ -1,0 +1,67 @@
+/* src/components/common/Loader/Loader.module.css */
+.loaderContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+  }
+  
+  .inlineContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin: 20px auto;
+  }
+  
+  .spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 16px;
+  }
+  
+  .spinnerRing {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid rgba(0, 122, 204, 0.1);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  .spinnerCore {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-primary);
+    border-radius: 50%;
+  }
+  
+  .loadingText {
+    color: var(--color-gray-700);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }

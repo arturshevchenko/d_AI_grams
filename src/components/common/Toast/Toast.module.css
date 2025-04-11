@@ -1,0 +1,29 @@
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: var(--z-index-tooltip);
+    max-width: 300px;
+    animation: fadeInOut 3s ease;
+    color: var(--color-white);
+  }
+  
+  .info {
+    background-color: var(--color-info);
+  }
+  
+  .success {
+    background-color: var(--color-success);
+  }
+  
+  .warning {
+    background-color: var(--color-warning);
+    color: var(--color-dark);
+  }
+  
+  .error {
+    background-color: var(--color-danger);
+  }

@@ -1,0 +1,72 @@
+:root {
+    /* Colors */
+    --color-primary: #007acc;
+    --color-primary-hover: #005fa3;
+    --color-secondary: #4a4a4a;
+    --color-success: #28a745;
+    --color-success-hover: #1e7e34;
+    --color-danger: #dc3545;
+    --color-warning: #ffc107;
+    --color-info: #17a2b8;
+    --color-light: #f8f9fa;
+    --color-dark: #343a40;
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-gray-100: #f8f9fa;
+    --color-gray-200: #e9ecef;
+    --color-gray-300: #dee2e6;
+    --color-gray-400: #ced4da;
+    --color-gray-500: #adb5bd;
+    --color-gray-600: #6c757d;
+    --color-gray-700: #495057;
+    --color-gray-800: #343a40;
+    --color-gray-900: #212529;
+    
+    /* Typography */
+    --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-base: 1rem;
+    --font-size-sm: 0.875rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 2rem;
+    --font-weight-normal: 400;
+    --font-weight-bold: 700;
+    --line-height-base: 1.5;
+    
+    /* Spacing */
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.5rem;
+    --spacing-6: 2rem;
+    --spacing-7: 2.5rem;
+    --spacing-8: 3rem;
+    
+    /* Borders */
+    --border-width: 1px;
+    --border-width-lg: 2px;
+    --border-radius: 0.25rem;
+    --border-radius-lg: 0.5rem;
+    --border-color: var(--color-gray-300);
+    
+    /* Shadows */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 1rem 2rem rgba(0, 0, 0, 0.175);
+    
+    /* Transitions */
+    --transition-base: all 0.3s ease;
+    
+    /* Z-indices */
+    --z-index-dropdown: 1000;
+    --z-index-sticky: 1020;
+    --z-index-fixed: 1030;
+    --z-index-modal-backdrop: 1040;
+    --z-index-modal: 1050;
+    --z-index-popover: 1060;
+    --z-index-tooltip: 1070;
+    
+    /* Container widths */
+    --container-max-width: 1200px;
+  }

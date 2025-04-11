@@ -1,0 +1,50 @@
+/* src/components/diagram/MermaidRenderer/MermaidRenderer.module.css */
+.container {
+    width: 100%;
+    min-height: 200px;
+    padding: 10px 0;
+  }
+  
+  .diagram {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .diagram svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    min-height: 200px;
+  }
+  
+  .loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-gray-600);
+    font-size: 16px;
+  }
+  
+  .error {
+    padding: 20px;
+    border: 1px solid var(--color-danger);
+    border-radius: var(--border-radius);
+    background-color: rgba(220, 53, 69, 0.05);
+    color: var(--color-danger);
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .error pre {
+    font-family: monospace;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    max-height: 200px;
+    overflow: auto;
+  }

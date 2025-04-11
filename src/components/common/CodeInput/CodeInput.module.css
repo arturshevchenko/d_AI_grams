@@ -1,0 +1,17 @@
+.textarea {
+    width: 100%;
+    padding: var(--spacing-3);
+    border: var(--border-width) solid var(--color-gray-300);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-family: monospace;
+    resize: vertical;
+    min-height: 120px;
+    transition: var(--transition-base);
+  }
+  
+  .textarea:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 122, 204, 0.25);
+  }

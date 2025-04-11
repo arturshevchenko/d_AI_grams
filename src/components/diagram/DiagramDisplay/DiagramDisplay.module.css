@@ -1,0 +1,24 @@
+.container {
+    margin-bottom: var(--spacing-8); /* Increased bottom margin for more spacing between diagrams */
+    padding: var(--spacing-4);
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .title {
+    font-size: var(--font-size-xl);
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .diagramContainer {
+    margin-top: var(--spacing-4);
+    padding: var(--spacing-4);
+    border: var(--border-width) solid var(--color-gray-200);
+    border-radius: var(--border-radius);
+    background-color: var(--color-gray-100);
+    overflow: auto;
+    /* Optional: You can set a max height if the diagrams are very large */
+    /* max-height: 600px; */
+  }

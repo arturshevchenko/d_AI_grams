@@ -1,0 +1,10 @@
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .button {
+    font-size: var(--font-size-sm);
+  }

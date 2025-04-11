@@ -1,0 +1,37 @@
+.section {
+    margin-bottom: var(--spacing-6);
+  }
+  
+  .sectionTitle {
+    font-size: var(--font-size-xl);
+    color: var(--color-gray-800);
+    margin-bottom: var(--spacing-5);
+    text-align: center;
+  }
+  
+  .inputsContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+  
+  .inputGroup {
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .inputTitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-3);
+  }
+  
+  .buttonContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-6);
+  }
+  
+  .generateButton {
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-2) var(--spacing-5);
+  }
