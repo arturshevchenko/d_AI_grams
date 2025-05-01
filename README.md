@@ -1,70 +1,135 @@
-# Getting Started with Create React App
+# Diagram Generator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Diagram Generator is a web-based application designed to generate system design diagrams using [Mermaid.js](https://mermaid-js.github.io/). It allows users to input project file structures, README content, and internal imports to generate visual representations of project architecture and dependencies.
 
-## Available Scripts
+## Demo
+![Demo](/demo.gif)
+[Download Video](/demo.mp4)
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Mermaid.js Integration**: Generate diagrams in Mermaid.js format.
+- **Customizable Diagrams**: Edit and apply changes to generated diagrams.
+- **Clipboard Support**: Copy and paste commands or content directly from/to the application.
+- **Local Storage**: Automatically save and load inputs and generated diagrams.
+- **Responsive Design**: Works seamlessly across devices.
+- **Toast Notifications**: Provides feedback for user actions like copying, pasting, and generating diagrams.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Table of Contents
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- [Getting Started](#getting-started)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Commands](#commands)
+- [Project Structure](#project-structure)
+- [Technologies Used](#technologies-used)
+- [License](#license)
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+Follow these instructions to set up and run the project locally.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Node.js (v16 or higher)
+- npm (v8 or higher)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Installation
 
-### `npm run eject`
+1. Clone the repository:
+```bash
+   git clone https://github.com/your-username/diagram-generator.git
+   cd diagram-generator/frontend/diagram_frontend
+```
+2. Install dependencies:
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Create a .env file in the root directory based on the .env_example file:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+cp .env_example .env
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+4. Add your OpenAI API key to the .env file:
+`REACT_APP_OPEN_API_API_KEY=your_openai_api_key`
+5. Start the development server:
+```bash
+npm start
+```
+6. Open the application in your browser at http://localhost:3000.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+## Usage
+1. Input File Tree: Paste the file tree structure of your project into the "File Tree" section.
+2. Input README Content: Paste the content of your project's README file into the "README Content" section.
+3. Input Imports: Paste the internal imports of your project into the "Imports" section.
+4. Generate Diagrams: Click the "Generate Diagrams" button to create system design diagrams.
+5. Edit Diagrams: Use the "Edit Diagram" button to modify the generated diagrams.
+6. Download Diagrams: Save the diagrams as SVG files using the "Download SVG" button.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Commands
+The following commands can be used to extract the required inputs for the application:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### File Tree Command
+```bash
+find . -type f \
+    -not -path "*/node_modules/*" \
+    -not -path "*/venv/*" \
+    -not -path "*/htmlcov/*"  \
+    -not -path "*/__pycache__/*"  \
+    -not -path "*/\\.*" \
+    | sed 's|^\\./||' \
+    | sort \
+    | sed 's/^/    "/;s/$/"/' \
+    | (echo "[" && cat && echo "]") \
+    | sed '$!s/$/,/'
+```
 
-### Code Splitting
+#### Imports Command
+```bash
+find . -type f \( -iname "*.java" -o -iname "*.py" -o -iname "*.js" -o -iname "*.ts" -o -iname "*.go" \
+    -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" \
+    -o -iname "*.kt" -o -iname "*.kts" \) \
+! -path "*/node_modules/*" \
+! -path "*/venv/*" \
+! -path "*/env/*" \
+! -path "*/.*" \
+-print0 | xargs -0 grep -H -E '^\\s*(import|from|#include)'
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Project Structure
+```
+diagram_frontend/
+├── public/                # Static assets
+├── src/                   # Source code
+│   ├── components/        # Reusable UI components
+│   ├── containers/        # Feature-specific containers
+│   ├── context/           # React context for state management
+│   ├── hooks/             # Custom React hooks
+│   ├── prompts/           # Prompt templates for OpenAI API
+│   ├── services/          # API and storage services
+│   ├── styles/            # Global and modular CSS styles
+│   ├── utils/             # Utility functions
+│   ├── [App.js](http://_vscodecontentref_/0)             # Main application component
+│   ├── [index.js](http://_vscodecontentref_/1)           # Entry point
+├── .env_example           # Example environment variables
+├── [package.json](http://_vscodecontentref_/2)           # Project metadata and dependencies
+└── [README.md](http://_vscodecontentref_/3)              # Project documentation
+```
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Technologies Used
+- Frontend: React, CSS Modules
+- Diagram Rendering: Mermaid.js
+- State Management: React Context API
+- API Integration: OpenAI API
+- Build Tool: React Scripts
+- Testing: React Testing Library, Jest
 
-### Making a Progressive Web App
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
