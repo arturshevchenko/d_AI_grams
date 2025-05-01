@@ -1,6 +1,7 @@
 # Diagram Generator
 
-Diagram Generator is a web-based application designed to generate system design diagrams using [Mermaid.js](https://mermaid-js.github.io/). It allows users to input project file structures, README content, and internal imports to generate visual representations of project architecture and dependencies.
+Diagram Generator is a web-based application designed to generate system design diagrams using [Mermaid.js](https://mermaid-js.github.io/). 
+It allows users to input project file structures, README content, and internal imports to generate visual representations of project architecture and dependencies.
 
 ## Demo
 
