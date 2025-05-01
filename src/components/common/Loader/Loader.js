@@ -6,7 +6,6 @@ const Loader = ({ text = "Generating diagrams...", inline = true }) => {
     <div className={inline ? styles.inlineContainer : styles.loaderContainer}>
       <div className={styles.spinner}>
         <div className={styles.spinnerRing}></div>
-        {/* <div className={styles.spinnerCore}></div> */}
       </div>
       {text && <div className={styles.loadingText}>{text}</div>}
     </div>
